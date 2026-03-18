@@ -1,0 +1,454 @@
+{
+  "name": "PDf Ingestion Pipeline",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "Загрузите Файл",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "data",
+              "fieldType": "file",
+              "acceptFileTypes": "pdf.",
+              "requiredField": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.5,
+      "position": [
+        -144,
+        -16
+      ],
+      "id": "748cb869-4c2b-43fe-9737-5ea02002f679",
+      "name": "On form submission",
+      "webhookId": "cb9fd601-a967-4324-b0a8-59c4ae84016e"
+    },
+    {
+      "parameters": {
+        "operation": "pdf",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1.1,
+      "position": [
+        64,
+        -16
+      ],
+      "id": "389a742c-d594-4474-8f88-1367f275f5de",
+      "name": "Extract from File"
+    },
+    {
+      "parameters": {
+        "mode": "insert",
+        "qdrantCollection": {
+          "__rl": true,
+          "value": "RAG Пример",
+          "mode": "id"
+        },
+        "embeddingBatchSize": 100,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreQdrant",
+      "typeVersion": 1.3,
+      "position": [
+        272,
+        -16
+      ],
+      "id": "62f1adac-3cdf-4110-b6cb-098822a00f49",
+      "name": "Qdrant Vector Store",
+      "credentials": {
+        "qdrantApi": {
+          "id": "flbHcKFF20wVs0Dt",
+          "name": "QdrantApi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        224,
+        176
+      ],
+      "id": "c957cf04-aeea-40ca-83d5-fa3a1e993b51",
+      "name": "Embeddings OpenAI",
+      "credentials": {
+        "openAiApi": {
+          "id": "nPqqURqHouQ3Ry8b",
+          "name": "n8n free OpenAI API credits"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsonMode": "expressionData",
+        "jsonData": "={{ $json.text }}",
+        "textSplittingMode": "custom",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "typeVersion": 1.1,
+      "position": [
+        416,
+        192
+      ],
+      "id": "4a8d9d39-7a7a-4a75-b778-2f4422f345c0",
+      "name": "Default Data Loader"
+    },
+    {
+      "parameters": {
+        "chunkSize": 300,
+        "chunkOverlap": 20,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.textSplitterRecursiveCharacterTextSplitter",
+      "typeVersion": 1,
+      "position": [
+        432,
+        368
+      ],
+      "id": "9c929726-d0ef-4c98-a308-2b3123b467d5",
+      "name": "Recursive Character Text Splitter"
+    }
+  ],
+  "pinData": {
+    "On form submission": [
+      {
+        "json": {
+          "data": [
+            {
+              "filename": "RAG Пример.pdf",
+              "mimetype": "application/pdf",
+              "size": 29757
+            }
+          ],
+          "submittedAt": "2026-03-18T15:58:02.438+00:00",
+          "formMode": "test"
+        },
+        "binary": {
+          "data": {
+            "mimeType": "application/pdf",
+            "fileType": "pdf",
+            "fileExtension": "pdf",
+            "data": "filesystem-v2",
+            "fileName": "RAG Пример.pdf",
+            "id": "filesystem-v2:workflows/wOyCDYSQyDFlUzZG/executions/temp/binary_data/57b18393-3622-4aef-a325-f1b93bbec4b5",
+            "fileSize": "29.8 kB",
+            "bytes": 29757
+          }
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ]
+  },
+  "connections": {
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "Extract from File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File": {
+      "main": [
+        [
+          {
+            "node": "Qdrant Vector Store",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings OpenAI": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Qdrant Vector Store",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Default Data Loader": {
+      "ai_document": [
+        [
+          {
+            "node": "Qdrant Vector Store",
+            "type": "ai_document",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Recursive Character Text Splitter": {
+      "ai_textSplitter": [
+        [
+          {
+            "node": "Default Data Loader",
+            "type": "ai_textSplitter",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "266c4da3-4f3b-4277-ac50-1f1db1df7c55",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "e3dc6f57c64420e7a694b297041263dd276565ee1e9a796bd9fc135fe11c3b8f"
+  },
+  "id": "wOyCDYSQyDFlUzZG",
+  "tags": []
+}
+{
+  "name": "RAG ChatBot",
+  "nodes": [
+    {
+      "parameters": {
+        "mode": "load",
+        "qdrantCollection": {
+          "__rl": true,
+          "value": "RAG Пример",
+          "mode": "list",
+          "cachedResultName": "RAG Пример"
+        },
+        "prompt": "={{ $json.message.text }}",
+        "topK": 3,
+        "includeDocumentMetadata": false,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreQdrant",
+      "typeVersion": 1.3,
+      "position": [
+        -32,
+        -32
+      ],
+      "id": "33be599f-e87e-469d-ba7d-58cd4633981b",
+      "name": "Qdrant Vector Store",
+      "credentials": {
+        "qdrantApi": {
+          "id": "flbHcKFF20wVs0Dt",
+          "name": "QdrantApi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -32,
+        176
+      ],
+      "id": "3bd60133-31c0-466a-8161-d50d135b61ac",
+      "name": "Embeddings OpenAI",
+      "credentials": {
+        "openAiApi": {
+          "id": "nPqqURqHouQ3Ry8b",
+          "name": "n8n free OpenAI API credits"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Ответь на вопрос -  {{ $('Telegram Trigger').item.json.message.text }}\nНа основании документа - {{ $json.pageContent }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        480,
+        -32
+      ],
+      "id": "4239528a-1c82-481f-bde9-396a5cae607c",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        432,
+        160
+      ],
+      "id": "7bf940be-b09d-49d2-ac35-84e669a94f6d",
+      "name": "OpenRouter Chat Model",
+      "credentials": {
+        "openRouterApi": {
+          "id": "2oKuQll8wItdgMhr",
+          "name": "OpenRouter account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.from.id }}",
+        "text": "={{ $json.output }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        816,
+        -32
+      ],
+      "id": "ca891457-6de8-4c46-a83b-3d2b8c339835",
+      "name": "Send a text message",
+      "webhookId": "53c0da58-06fc-408f-bf24-df91cd99381a",
+      "credentials": {
+        "telegramApi": {
+          "id": "RNE8hlEFuatL8cmq",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -256,
+        -32
+      ],
+      "id": "acefd6e8-9cd1-48d0-ad97-ebee3bc24585",
+      "name": "Telegram Trigger",
+      "webhookId": "d825ac41-0b45-4c42-b0eb-3a88afd97c34",
+      "credentials": {
+        "telegramApi": {
+          "id": "RNE8hlEFuatL8cmq",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fieldsToAggregate": {
+          "fieldToAggregate": [
+            {
+              "fieldToAggregate": "document.pageContent"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        272,
+        -32
+      ],
+      "id": "95a499b8-2155-43a9-87de-5932f0405109",
+      "name": "Aggregate"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Embeddings OpenAI": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Qdrant Vector Store",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Qdrant Vector Store": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "Qdrant Vector Store",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "8fb40d54-238d-46f9-8b81-1ff1757d0cc4",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "e3dc6f57c64420e7a694b297041263dd276565ee1e9a796bd9fc135fe11c3b8f"
+  },
+  "id": "bh8db32ccR4Os75p",
+  "tags": []
+}
