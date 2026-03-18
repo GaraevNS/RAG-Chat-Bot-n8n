@@ -13,3 +13,8 @@ Telegram → Qdrant Search → OpenRouter Chat → Telegram Reply
 | Метрика | Значение |
 | Точность | 92% |
 | Скорость | 2.8 сек |
+
+Стек: n8n • OpenRouter • Qdrant Cloud • Telegram
+
+---
+👨‍💻 Гараев Никита | AI Engineer 
