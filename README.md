@@ -10,7 +10,6 @@ PDF → n8n Default Data Loader → OpenRouter Embeddings → Qdrant
 Telegram → Qdrant Search → OpenRouter Chat → Telegram Reply
 
 📊 Результаты
-| Метрика | Значение |
 | Точность | 92% |
 | Скорость | 2.8 сек |
 
