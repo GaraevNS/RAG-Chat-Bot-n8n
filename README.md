@@ -10,8 +10,8 @@ PDF → n8n Default Data Loader → OpenRouter Embeddings → Qdrant
 Telegram → Qdrant Search → OpenRouter Chat → Telegram Reply
 
 📊 Результаты
-| Точность | 92% |
-| Скорость | 2.8 сек |
+Скорость - 10 сек
+Цена - ~330 токенов ChatGPT 4o Mini (0.00013$)
 
 Стек: n8n • OpenRouter • Qdrant Cloud • Telegram
 
