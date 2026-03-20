@@ -9,9 +9,8 @@ AI-бот ищет ответы в PDF-документах:
 PDF → n8n Default Data Loader → OpenRouter Embeddings → Qdrant
 Telegram → Qdrant Search → OpenRouter Chat → Telegram Reply
 
-📊 Результаты
-Скорость - 10 сек
-Цена - ~330 токенов ChatGPT 4o Mini (0.00013$)
+📊 Результаты:
+| Скорость - 10 сек | Цена - ~330 токенов ChatGPT 4o Mini (0.00013$) |
 
 Стек: n8n • OpenRouter • Qdrant Cloud • Telegram
 
